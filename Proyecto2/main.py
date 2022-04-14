@@ -1,11 +1,12 @@
 from tkinter import *
 from tkinter import Tk,filedialog, messagebox
 
-from matplotlib.pyplot import text
-
 
 def clearTextInput():
     txt.delete("1.0","end")
+
+def clean():
+    input.delete("0","end")
 
 def leerForm():
     Tk().withdraw() #Pido Archivo
@@ -23,14 +24,19 @@ def leerForm():
 
 def getText():
     texto = ''
+    space = '\t\t\t\t\t\t\t'
     texto = input.get()
-    if texto != "":
-        txt.insert('insert','\t'+texto+'\n')
-    else:
+    if texto == "":
         txt.insert('insert','BRUUUUH\n')    
+    elif texto == 'ADIOS':
+        txt.insert('insert',space+texto+'\n')
+        txt.insert('insert','ADIOS\n')
+    else:
+        txt.insert('insert','\t'+texto+'\n')
+
 # Aqui esta toda la app grafica.
 if __name__ == '__main__':
-
+    DIVISION = '*-----------------------------------------------------------------------------------------------------------------------------*'
     window = Tk()
     window.geometry('850x590')
     window.title("Proyecto 2 LFP")
@@ -51,8 +57,12 @@ if __name__ == '__main__':
 
     btnExit = Button(window, text="EXIT",bg='red',borderwidth=5,fg='white',font='Arial 10 bold',command=window.destroy,height=2,width=7)
     btnExit.place(x=720,y=320)
+    btnLimp = Button(window, text="Limpiar texto",bg='blue',borderwidth=5,fg='white',font='Arial 10 bold',command=clean,height=1,width=10)
+    btnLimp.place(x=700,y=470)
 
     txt = Text(window,height=26,width=80,font='Arial 11',foreground='white')
     txt.config(bg='#2E2E2E')
     txt.place(x=20,y=36)
+    txt.insert('insert',DIVISION+'\t\t\t       Bienvenido a La Liga Bot, ingrese un comando\n'+DIVISION)
+    
     window.mainloop()
