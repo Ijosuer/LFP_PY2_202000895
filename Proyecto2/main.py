@@ -27,12 +27,18 @@ def getText():
     space = '\t\t\t\t\t\t\t'
     texto = input.get()
     if texto == "":
+        txt.config(state='normal')
         txt.insert('insert','BRUUUUH\n')    
+        txt.config(state='disabled')
     elif texto == 'ADIOS':
+        txt.config(state='normal')
         txt.insert('insert',space+texto+'\n')
         txt.insert('insert','ADIOS\n')
+        
     else:
+        txt.config(state='normal')
         txt.insert('insert','\t'+texto+'\n')
+        txt.config(state='disabled')
 
 # Aqui esta toda la app grafica.
 if __name__ == '__main__':
@@ -64,5 +70,6 @@ if __name__ == '__main__':
     txt.config(bg='#2E2E2E')
     txt.place(x=20,y=36)
     txt.insert('insert',DIVISION+'\t\t\t       Bienvenido a La Liga Bot, ingrese un comando\n'+DIVISION)
+    txt.config(state='disabled')
     
     window.mainloop()
