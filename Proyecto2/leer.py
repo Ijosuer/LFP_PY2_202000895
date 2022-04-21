@@ -40,18 +40,22 @@ class Lecturas:
                 ans+=(row['Goles2'])
         print(ans)
     def resultadoJornada(self):
+        flagF = True
         '''Retorna HMTL de jornada y temporada con todos los datos'''
         reader = self.lectura()
         numero = '2'
         temporada = '1981-1982'
-        listaData = []
         for row in reader:
             if row['Jornada'] == numero and row['Temporada'] == temporada:
                 self.data.append(Bot(row['Fecha'],row['Temporada'],row['Jornada'],row['Equipo1'],row['Equipo2'],row['Goles1'],row['Goles2']))
        
+        if flagF == False:
+            ruta = 'Proyecto2/archivos/jornada.html'
+        else:
+            ruta = 'Proyecto2/archivos/jornada.html'
 
         texto = ''
-        f = open('Proyecto2/archivos/jornada.html','w')
+        f = open(ruta,'w')
         texto += '''
         <!DOCTYPE html>
         <html lang="en">
@@ -73,9 +77,9 @@ class Lecturas:
         <body style="background-color: rgb(243, 240, 235);">
         <div class="container">
         <br>
-        <h2 class="text-center" style="font-weight: bold; color: rgb(36, 36, 179);">Tabla de Tokens</h2>
+        <h2 class="text-center" style="font-weight: bold; color: rgb(36, 36, 179);">Datos JORNADA</h2>
         <br>
-        <h6 style="font-weight:600 ;">A continuacion se presentan tabla de tokens encontrados en el lenguaje:</h6>
+        <h6 style="font-weight:600 ;">A continuacion se presentan todos los datos recopilados en la jornada seleccionada:</h6>
         <table class="table table-hover">
             <thead class="thead-dark">
         <tr>
@@ -116,7 +120,7 @@ class Lecturas:
         mensaje = texto 
         f.write(mensaje)
         f.close()
-        webbrowser.open_new_tab('Proyecto2/archivos/jornada.html')
+        webbrowser.open_new_tab(ruta)
     def totalGoles():
         pass
     def tablaGeneral():

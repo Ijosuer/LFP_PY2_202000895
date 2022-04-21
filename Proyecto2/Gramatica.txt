@@ -1,0 +1,35 @@
+---GRAMATICA DEL PROYECTO 2 LFP 2022---
+
+Inicio ::= <RESULTADO>
+        |  <JORNADA>
+        |  <GOLES>
+        |  <TABLA>
+        |  <TEMPORADA>
+        |  <PARTIDOS>
+        |  <TOP>
+        |  <ADIOS>
+
+<RESULTADO> ::= res_resultado cadena res_vs cadena res_temp tk_years
+
+<JORNADA> ::= res_jornada tk_num2 res_temp tk_years <JORNADA'>
+<JORNADA'> ::= tk_flag tk_id
+            | epsilon
+
+<GOLES> ::= res_goles res_local cadena res_temp tk_years
+         |  res_goles res_visita cadena res_temp tk_years
+         |  res_goles res_total cadena res_temp tk_years
+
+<TABLA TEMPORADA> ::= res_tt tk_years <TABLA TEMPORADA'> \\pendinete
+<TABLA TEMPORADA'> ::= tk_flag tk_id
+                    |  epsilon
+
+<PARTIDOS> ::= res_partidos cadena res_temp tk_years <PARTIDOS'>
+<PARTIDOS'> ::= tk_flag tk_id
+             |  tk_ji tk_num2
+             |  tk_jf tk_num2
+             |  epsilon
+
+<TOP> ::= res_top res_sup res_temp tk_years <TOP'>
+       |  res_top res_inf res_temp tk_years <TOP'>
+<TOP'> ::= tk_n tk_num2
+        |  epsilon
