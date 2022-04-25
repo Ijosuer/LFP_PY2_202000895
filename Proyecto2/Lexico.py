@@ -1,18 +1,18 @@
 from Token import Token
 from Error import Error
 from prettytable import PrettyTable
+from Sintactico import AnalizadorSintactico
 
+RESERVADAS = ['RESULTADO','VS','TEMPORADA','JORNADA','-f','-n','-ji','-jf','GOLES','TABLA','LOCAL','VISITANTE','TOTAL','PARTIDOS','TOP','SUPERIOR','INFERIOR','ADIOS']
 class AnalizadorLexico:
-    
     def __init__(self) -> None:
         self.listaTokens  = []
         self.listaErrores = []
         self.linea = 1
-        self.columna = 0
+        self.columna = 1
         self.buffer = ''
         self.estado = 0
         self.i = 0
-        self.flag_comillas = False
 
     def agregar_token(self,caracter,linea,columna,token):
         self.listaTokens.append(Token(caracter,linea,columna,token))
@@ -52,6 +52,8 @@ class AnalizadorLexico:
             self.buffer += caracter
             self.estado = 1
             self.columna += 1   
+        elif caracter == '[' or caracter ==']':
+            self.columna +=1
         elif caracter== '\n':
             self.linea += 1
             self.columna = 0
@@ -73,13 +75,13 @@ class AnalizadorLexico:
             self.buffer += caracter
             self.columna += 1          
         else: 
-            if self.buffer in ['RESULTADO','VS','TEMPORADA','JORNADA','-f','GOLES','TABLA','TEMPORADA','PARTIDOS','TOP','SUPERIOR','INFERIOR','ADIOS']:
-                self.agregar_token(self.buffer,self.linea,self.columna,'reservada_'+self.buffer)    
+            if self.buffer in RESERVADAS:
+                self.agregar_token(self.buffer,self.linea,self.columna-len(self.buffer),'res_'+self.buffer)    
                 self.estado = 0
                 self.i -= 1
 
             else:
-                self.agregar_token(self.buffer,self.linea,self.columna,'ID')
+                self.agregar_token(self.buffer,self.linea,self.columna-len(self.buffer),'ID')
                 self.estado = 0
                 self.i -= 1
 
@@ -103,19 +105,19 @@ class AnalizadorLexico:
             self.columna += 1
         else:
             if len(self.buffer) == 6:
-                self.agregar_token(self.buffer,self.linea,self.columna,'year')
+                self.agregar_token(self.buffer,self.linea,self.columna-len(self.buffer),'tk_year')
                 self.estado = 0
                 self.i -= 1
             if len(self.buffer) == 11:
-                self.agregar_token(self.buffer,self.linea,self.columna,'jornadas')
+                self.agregar_token(self.buffer,self.linea,self.columna-len(self.buffer),'tk_temporada')
                 self.estado = 0
                 self.i -= 1
             elif len(self.buffer) <= 2 and len(self.buffer) >0:
-                self.agregar_token(self.buffer,self.linea,self.columna,'numero_gol')
+                self.agregar_token(self.buffer,self.linea,self.columna-len(self.buffer),'tk_num')
                 self.estado = 0
                 self.i -= 1
             else:
-                self.agregar_error(self.buffer,self.linea,self.columna)
+                self.agregar_error(self.buffer,self.linea,self.columna-len(self.buffer))
 
     def s3(self,caracter):
         '''Estado 3 - cadenas'''
@@ -126,24 +128,12 @@ class AnalizadorLexico:
         else:
             self.buffer += caracter
             self.columna += 1
+
     def s4(self,caracter : str):
-        '''Estado 3 - cadenas'''
-        if caracter.isalpha():
-            self.estado = 4
-            self.buffer += caracter
-            self.columna += 1
-        elif caracter in ['+','!','*','@','-',':',';','#','%','^','&','?',',','.','|']:
-            self.estado = 4
-            self.buffer += caracter
-            self.columna += 1
-        elif caracter.isdigit():
-            self.estado = 4
-            self.buffer += caracter
-            self.columna += 1
-        else:
-            self.agregar_token(self.buffer,self.linea,self.columna,'Cadena X')
-            self.estado = 0
-            self.i -= 1
+        '''Estado 4 - cadenas'''
+        self.agregar_token(self.buffer,self.linea,self.columna-len(self.buffer),'Cadena')
+        self.estado = 0
+        self.i -= 1
 
     def analizar(self, cadena):
         cadena = cadena + '$'
@@ -165,11 +155,21 @@ class AnalizadorLexico:
 
     def imprimirTokens(self):
         '''Imprime una tabla con los tokens'''
-        x = PrettyTable()
-        x.field_names = ["Lexema","linea","columna","tipo"]
+        # x = PrettyTable()
+        text = 'LEXEMA - FILA - COL - TIPO\n'
+        # x.field_names = ["Lexema","linea","columna","tipo"]
         for token in self.listaTokens:
-            x.add_row([token.lexema, token.fila, token.columna,token.tipo])
-        print(x)
+            
+            # x.add_row([token.lexema, token.fila, token.columna,token.tipo])
+            text+=(token.lexema)
+            text+=' ['
+            text+=(str(token.fila))
+            text+=' '
+            text+=(str(token.columna))
+            text+='] '
+            text+=(token.tipo)
+            text+='\n'
+        return text
 
     def imprimirErrores(self):
         '''Imprime una tabla con los errores'''
@@ -179,7 +179,16 @@ class AnalizadorLexico:
             x.add_row([error_.descripcion, error_.fila, error_.columna])
         print(x)  
 
+    def limpiarTokens(self):self.listaTokens = []
+    def limpiarErrores(self):self.listaErrores = []
+
 obj = AnalizadorLexico()
-obj.analizar('<1234-1234>"a fd" 2 JORNADAS')
-obj.imprimirTokens()
-obj.imprimirErrores()
+obj.analizar('TABLA  <1996-1997> ')
+res = obj.imprimirTokens()
+res2 = obj.imprimirErrores()
+
+print(res)
+sint = AnalizadorSintactico(obj.listaTokens)
+sint.analizar()
+sint.imprimirErrores()
+sint.imprimirErroresNone()

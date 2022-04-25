@@ -22,12 +22,12 @@ class Lecturas:
                 mycsv.append(row)
         return mycsv
 
-    def resultadoPartido(self):
+    def resultadoPartido(self,equipo1,equipo2):
         '''Retorna equipos y goles'''
         reader = self.lectura()
         equipos = []
-        equipo1 = 'Español'
-        equipo2= 'AD Almería'
+        # equipo1 = 'Español'
+        # equipo2= 'AD Almería'
         equipos.append(equipo1)
         equipos.append(equipo2)
         ans = 'El resultado fue: '
@@ -39,6 +39,7 @@ class Lecturas:
                 ans+=(row['Equipo2'])+' '
                 ans+=(row['Goles2'])
         print(ans)
+
     def resultadoJornada(self):
         flagF = True
         '''Retorna HMTL de jornada y temporada con todos los datos'''
@@ -129,5 +130,3 @@ class Lecturas:
         pass
     def Top():
         pass
-obj = Lecturas()
-obj.resultadoJornada()

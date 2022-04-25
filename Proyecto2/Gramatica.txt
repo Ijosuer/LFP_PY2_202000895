@@ -4,7 +4,6 @@ Inicio ::= <RESULTADO>
         |  <JORNADA>
         |  <GOLES>
         |  <TABLA>
-        |  <TEMPORADA>
         |  <PARTIDOS>
         |  <TOP>
         |  <ADIOS>
@@ -15,13 +14,14 @@ Inicio ::= <RESULTADO>
 <JORNADA'> ::= tk_flag tk_id
             | epsilon
 
-<GOLES> ::= res_goles res_local cadena res_temp tk_years
-         |  res_goles res_visita cadena res_temp tk_years
-         |  res_goles res_total cadena res_temp tk_years
+<GOLES> ::= res_goles <GOLES'> cadena res_temp tk_years
+<GOLES'> ::= res_local
+	  |  res_visitante
+	  |  res_total
 
-<TABLA TEMPORADA> ::= res_tt tk_years <TABLA TEMPORADA'> \\pendinete
-<TABLA TEMPORADA'> ::= tk_flag tk_id
-                    |  epsilon
+<TABLA> ::= res_TABLA res_temp tk_years <TABLA TEMPORADA'>
+<TABLA'> ::= tk_flag tk_id
+          |  epsilon
 
 <PARTIDOS> ::= res_partidos cadena res_temp tk_years <PARTIDOS'>
 <PARTIDOS'> ::= tk_flag tk_id
@@ -33,3 +33,5 @@ Inicio ::= <RESULTADO>
        |  res_top res_inf res_temp tk_years <TOP'>
 <TOP'> ::= tk_n tk_num2
         |  epsilon
+
+<ADIOS> ::= res_bye
