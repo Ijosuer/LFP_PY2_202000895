@@ -1,8 +1,6 @@
 from Token import Token
 from Error import Error
 from prettytable import PrettyTable
-from Sintactico import AnalizadorSintactico
-
 RESERVADAS = ['RESULTADO','VS','TEMPORADA','JORNADA','-f','-n','-ji','-jf','GOLES','TABLA','LOCAL','VISITANTE','TOTAL','PARTIDOS','TOP','SUPERIOR','INFERIOR','ADIOS']
 class AnalizadorLexico:
     def __init__(self) -> None:
@@ -182,13 +180,17 @@ class AnalizadorLexico:
     def limpiarTokens(self):self.listaTokens = []
     def limpiarErrores(self):self.listaErrores = []
 
+    def parser(self):
+        pass
+'''
 obj = AnalizadorLexico()
-obj.analizar('TABLA  <1996-1997> ')
+obj.analizar('RESULTADO "Barcelona" VS "Levante" fa!@ <2019-2020>')
 res = obj.imprimirTokens()
-res2 = obj.imprimirErrores()
 
 print(res)
-sint = AnalizadorSintactico(obj.listaTokens)
-sint.analizar()
-sint.imprimirErrores()
-sint.imprimirErroresNone()
+sint = Sintactico.AnalizadorSintactico(obj.listaTokens)
+# sint.analizar()
+# sint.imprimirErrores()
+# sint.imprimirErroresNone()
+
+'''

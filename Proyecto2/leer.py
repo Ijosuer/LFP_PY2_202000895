@@ -1,46 +1,49 @@
 import csv
 import time
 import webbrowser
-class Bot:
-    def __init__(self,fecha,tempo,jornada,eq1,eq2,gol1,gol2):
-        self.fecha = fecha
-        self.tempo = tempo
-        self.jornada = jornada
-        self.eq1 = eq1
-        self.eq2 = eq2
-        self.gol1 = gol1
-        self.gol2 = gol2
-
+import ok
 class Lecturas:
     def __init__(self):
+        self.mensaje = ''
         self.data = []
+
     def lectura(self):
-        with open('Proyecto2/archivo1.csv') as csvfile:
+        with open('Proyecto2/archivo.csv') as csvfile:
             reader = csv.DictReader(csvfile)
             mycsv = []
             for row in reader:
                 mycsv.append(row)
         return mycsv
 
-    def resultadoPartido(self,equipo1,equipo2):
+    def resultadoPartido(self,equipo1,equipo2,fecha):
         '''Retorna equipos y goles'''
         reader = self.lectura()
-        equipos = []
         # equipo1 = 'Español'
         # equipo2= 'AD Almería'
-        equipos.append(equipo1)
-        equipos.append(equipo2)
+        equipo1=equipo1.replace('"','')
+        equipo2=equipo2.replace('"','')
+        characters = "<>"
+        fecha = ''.join( x for x in fecha if x not in characters)
         ans = 'El resultado fue: '
         for row in reader:
-            if row['Equipo1'] in equipos:
+            if row['Equipo1'] == equipo1 and row['Equipo2'] == equipo2 and row['Temporada'] == fecha:
                 ans += (row['Equipo1'])+ ' '
                 ans+=(row['Goles1'])+' - '
-            if row['Equipo2'] in equipos:
                 ans+=(row['Equipo2'])+' '
                 ans+=(row['Goles2'])
-        print(ans)
+        if ans =='El resultado fue: ':
+            print('>>Revisar nombres y fechas por favor ')
+            ok.mensaje = '>>Revisar nombres y fechas por favor '
+        else:
+            # txt.config(state='normal')
+            # txt.insert('end',ans,("LEFT",))
+            self.mensaje = (ans)
+            # obje.mensaje.append(ans)          
+            print(ans)
+            ok.mensaje = ans
+            return
 
-    def resultadoJornada(self):
+    def resultadoJornada(self,jornada,fecha,ruta):
         flagF = True
         '''Retorna HMTL de jornada y temporada con todos los datos'''
         reader = self.lectura()
@@ -48,7 +51,7 @@ class Lecturas:
         temporada = '1981-1982'
         for row in reader:
             if row['Jornada'] == numero and row['Temporada'] == temporada:
-                self.data.append(Bot(row['Fecha'],row['Temporada'],row['Jornada'],row['Equipo1'],row['Equipo2'],row['Goles1'],row['Goles2']))
+                pass# self.data.append(Bot(row['Fecha'],row['Temporada'],row['Jornada'],row['Equipo1'],row['Equipo2'],row['Goles1'],row['Goles2']))
        
         if flagF == False:
             ruta = 'Proyecto2/archivos/jornada.html'
@@ -130,3 +133,6 @@ class Lecturas:
         pass
     def Top():
         pass
+
+# obj = Lecturas()
+# obj.resultadoPartido('Levante','Español','2017-2018')

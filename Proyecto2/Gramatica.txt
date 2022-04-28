@@ -19,7 +19,7 @@ Inicio ::= <RESULTADO>
 	  |  res_visitante
 	  |  res_total
 
-<TABLA> ::= res_TABLA res_temp tk_years <TABLA TEMPORADA'>
+<TABLA> ::= res_TABLA res_temp tk_years <TABLA'>
 <TABLA'> ::= tk_flag tk_id
           |  epsilon
 

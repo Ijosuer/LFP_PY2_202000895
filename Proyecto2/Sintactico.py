@@ -1,13 +1,12 @@
-from re import L
 from prettytable import PrettyTable
-# from bases import *
-
+import leer
 class AnalizadorSintactico:
 
     def __init__(self,tokens : list):
         self.errores = []
         self.erroresNone = []
         self.tokens = tokens
+        self.obj = leer.Lecturas()
         
     def agregarError(self,esperado,obtenido,fila,columna):
         self.errores.append(
@@ -76,7 +75,7 @@ class AnalizadorSintactico:
                 self.agregarError("Cadena","EOF",'1','1')
                 return
             elif token.tipo == "Cadena":
-                #jalar datos --- pendiente
+                equipo1 = token.lexema
                 # Sacar otro token -- se espera res_VS
                 token = self.sacarToken()
                 if token is None:
@@ -89,11 +88,12 @@ class AnalizadorSintactico:
                         self.agregarError("Cadena","EOF",'1','1')
                         return
                     elif token.tipo == 'Cadena':
+                        equipo2 = token.lexema
                     # Sacar otro token -- se espera res_temp
                         token = self.sacarToken()
+                        token2 = self.observarToken()
                         if token is None:
                             self.agregarError("res_TEMPORADA","EOF",'1','1')
-                            return
                         elif token.tipo == 'res_TEMPORADA':
                             # Sacar otro token -- se espera tk_years
                             token = self.sacarToken()
@@ -101,13 +101,20 @@ class AnalizadorSintactico:
                                 self.agregarError("tk_temporada","EOF",'1','1')
                                 return
                             elif token.tipo == 'tk_temporada':
+                                fecha = token.lexema
                                 #YA TERMINO EL ANALISIS #
                                 #LLAMO funcionalidad
                                 print('CADENA CORRECTA PAPSSS')
+                                self.obj.resultadoPartido(equipo1,equipo2,fecha)
                             else:
                                 self.agregarError("tk_temporada",token.tipo,token.fila,token.columna)
+                        elif token2.tipo == 'tk_temporada':
+                                self.agregarError('res_TEMPORADA',token.tipo,1,token.columna)
+                                fecha = token2.lexema
+                                print('CADENA CORRECTA PAPSSS')
+                                self.obj.resultadoPartido(equipo1,equipo2,fecha)
                         else:
-                            self.agregarError("res_TEMPORADA",token.tipo,token.fila,token.columna)
+                            self.agregarError("res_TEMPORADA",token2.tipo,token2.fila,token2.columna)
                     else:
                         self.agregarError("cadena",token.tipo,token.fila,token.columna)
                 else:
@@ -120,7 +127,7 @@ class AnalizadorSintactico:
     def JORNADA(self):
         '''HTML de todos los partidos de una jornada y temporada'''
         #Produccion
-            # <JORNADA> ::= res_jornada tk_num2 res_temp tk_temporada <JORNADA'>
+            # <JORNADA> ::= res_jornada tk_num res_temp tk_temporada <JORNADA'>
             # <JORNADA'> ::= tk_flag tk_id
             #             | epsilon
 
@@ -130,7 +137,7 @@ class AnalizadorSintactico:
             self.agregarError('res_JORNADA','EOF','1','1')
             return
         elif token.tipo == 'res_JORNADA':
-            # Sacar token --- se espera tk_num2
+            # Sacar token --- se espera tk_num
             token = self.sacarToken()
             if token is None:
                 self.agregarError('tk_num','EOF','1','1')
@@ -311,13 +318,20 @@ class AnalizadorSintactico:
                     elif token.tipo == 'tk_temporada':
                         #Llamo a mi otra funcion
                         self.PARTIDOS_()
-    
+                    else:
+                        self.agregarError('tk_temporada',token.tipo,token.fila,token.columna)
+                else:
+                        self.agregarError('res_TEMPORADA',token.tipo,token.fila,token.columna)
+            else:
+                self.agregarError('Cadena',token.tipo,token.fila,token.columna)
+        else:
+            self.agregarError('res_PARTIDOS',token.tipo,token.fila,token.columna)
 #PENDIENTE DE COMPLETARRRRRR
     def PARTIDOS_(self):
         #Produccion:
-        '''<PARTIDOS'> ::= tk_flag tk_id
-             |  tk_ji tk_num2
-             |  tk_jf tk_num2
+        '''<PARTIDOS'> ::= res_flag tk_id
+             |  res_ji tk_num
+             |  res_jf tk_num
              |  epsilon'''
         token = self.observarToken()
         if token is None:
@@ -330,11 +344,54 @@ class AnalizadorSintactico:
                 self.agregarErrorNone('ID','EOF')
                 return
             elif token.tipo == 'ID':
-                
-                print('Se acepta y cambia nombre')
-            
+                token = self.observarToken()
+                if token is None:
+                    print('Se acepta y cambia nombre')
+                    return
+                elif token.tipo == 'res_-ji':
+                    token = self.sacarToken()
+                    token = self.sacarToken()
+                    if token is None:
+                        self.agregarErrorNone('tk_num','EOF')
+                        return
+                    elif token.tipo == 'tk_num':
+                        token = self.sacarToken()
+                        if token is None:
+                            print('VINIERON 1 Y NOMBRE')
+                            return
+                        elif token.tipo == 'res_-jf':
+                            token = self.sacarToken()
+                            if token is None:
+                                self.agregarErrorNone('tk_num','EOF')
+                                return
+                            elif token.tipo == 'tk_num':
+                                print('VINIERON LAS 3')
+                                return
+                            else:
+                                self.agregarError('tk_num',token.tipo,token.fila,token.columna)
+                        else:
+                            self.agregarError('res_jf',token.tipo,token.fila,token.columna)
+                    else:
+                        self.agregarError('tk_num',token.tipo,token.fila,token.columna)
+                elif token.tipo == 'res_-jf':
+                    token = self.sacarToken()
+                    token = self.sacarToken()
+                    if token is None:
+                        self.agregarErrorNone('tk_num','EOF')
+                    elif token == 'tk_num':
+                        print('VINIERON LAS 3')
+                        return
+                else:
+                    self.agregarError('res_ji | res_jf',token.tipo,token.fila,token.columna)
             else:
                 self.agregarError('ID',token.tipo,token.fila,token.columna)
+        elif token.tipo == 'res_ji':
+            token = self.sacarToken()
+            token = self.sacarToken()
+            if token.tipo is None:
+                self.agregarErrorNone('tk_num','EOF')
+            elif token.tipo == 'tk_num':
+                print('vino ji y numero chido then')
         else:
                 self.agregarError('res_flag',token.tipo,token.fila,token.columna)
             
